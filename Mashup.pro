@@ -24,8 +24,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    program.cpp \
+    segment.cpp \
+    sequence.cpp \
+    searcharea.cpp \
+    segmentlistmodel.cpp \
+    segmentsearchmodel.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    program.h \
+    segment.h \
+    sequence.h \
+    srtparser.h \
+    searcharea.h \
+    segmentlistmodel.h \
+    segmentsearchmodel.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    searcharea.ui
+
+DISTFILES += \
+    Mashup.pro.user

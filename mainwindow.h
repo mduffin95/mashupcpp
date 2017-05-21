@@ -1,8 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include "searcharea.h"
+#include "segmentlistmodel.h"
 
 #include <QMainWindow>
-#include <QPlainTextEdit>
 
 namespace Ui {
 class MainWindow;
@@ -16,7 +17,16 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    QPlainTextEdit *textEdit;
+    void createDockWindows();
+
+    QListView *view;
+    SearchArea *searchArea;
+
+    SegmentListModel *model;
+    //Program *prog;
+
+private slots:
+    void on_actionOpen_triggered();
 
 private:
     Ui::MainWindow *ui;
