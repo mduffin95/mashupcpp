@@ -17,24 +17,14 @@ QString Segment::getText()
     return ref.toString();
 }
 
-int Segment::getPosition()
+QString Segment::serialize()
 {
-    return ref.position();
+    return QString::number(ref.position()) + "," + QString::number(ref.length());
 }
 
-int Segment::getLength()
+void Segment::deserialize(QString encoding)
 {
-    return ref.length();
-}
-
-int Segment::setPosition(int pos)
-{
-    QStringRef tmp = ref;
-    ref = QStringRef(tmp.string(), pos, tmp.length());
-}
-
-int Segment::setLength(int len)
-{
-    QStringRef tmp = ref;
-    ref = QStringRef(tmp.string(), tmp.position(), len);
+    QStringList result = encoding.split(',');
+    Q_ASSERT(result.length() == 2);
+    ref = program->getStringRef(result[0].toInt(), result[1].toInt());
 }

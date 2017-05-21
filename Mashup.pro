@@ -39,7 +39,8 @@ HEADERS  += mainwindow.h \
     srtparser.h \
     searcharea.h \
     segmentlistmodel.h \
-    segmentsearchmodel.h
+    segmentsearchmodel.h \
+    constants.h
 
 FORMS    += mainwindow.ui \
     searcharea.ui

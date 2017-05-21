@@ -11,11 +11,9 @@ public:
     Segment(Program *prog, int start, int end);
 
     QString getText();
-    int getPosition();
-    int getLength();
 
-    int setPosition(int pos);
-    int setLength(int len);
+    QString serialize();
+    void deserialize(QString encoding);
 
 private:
     Program *program; //TODO: remove this

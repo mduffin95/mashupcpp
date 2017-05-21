@@ -1,7 +1,9 @@
 #include "segmentsearchmodel.h"
+#include "constants.h"
 #include <QtDebug>
 #include <QStringListModel>
 #include <QMimeData>
+
 
 int SegmentSearchModel::rowCount(const QModelIndex &parent) const
 {
@@ -20,10 +22,8 @@ QVariant SegmentSearchModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::DisplayRole)
         return segmentList.at(index.row())->getText();
-    if (role == 0x0100)
-        return segmentList.at(index.row())->getPosition();
-    if (role == 0x0101)
-        return segmentList.at(index.row())->getLength();
+    if (role == Constants::SerializeRole)
+        return segmentList.at(index.row())->serialize();
     else
         return QVariant();
 }
@@ -32,15 +32,9 @@ bool SegmentSearchModel::setData(const QModelIndex &index,
                               const QVariant &value, int role)
 {
     if (index.isValid()) {
-        if (role == 0x100)
+        if (role == Constants::SerializeRole)
         {
-            segmentList.at(index.row())->setPosition(value.toInt());
-            emit dataChanged(index, index);
-            return true;
-        }
-        if (role == 0x101)
-        {
-            segmentList.at(index.row())->setLength(value.toInt());
+            segmentList.at(index.row())->deserialize(value.toString());
             emit dataChanged(index, index);
             return true;
         }
@@ -48,8 +42,7 @@ bool SegmentSearchModel::setData(const QModelIndex &index,
     return false;
 }
 
-QVariant SegmentSearchModel::headerData(int section, Qt::Orientation orientation,
-                                     int role) const
+QVariant SegmentSearchModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -81,8 +74,6 @@ void SegmentSearchModel::search(QString searchString)
             segmentList.append(new Segment(program, from, searchString.length()));
             from += 1;
         }
-
-        //qDebug() << QString::number(from);
     }
     endResetModel();
 }
@@ -143,7 +134,7 @@ QMimeData *SegmentSearchModel::mimeData(const QModelIndexList &indexes) const
 
     foreach (const QModelIndex &index, indexes) {
         if (index.isValid()) {
-            stream << data(index, 0x100).toString() + "," + data(index, 0x101).toString();
+            stream << data(index, Constants::SerializeRole).toString();
         }
     }
 
@@ -202,10 +193,7 @@ bool SegmentSearchModel::dropMimeData(const QMimeData *data,
     foreach (const QString &text, newItems)
     {
         QModelIndex idx = index(beginRow, 0, QModelIndex());
-        qDebug() << idx;
-        QStringList result = text.split(',');
-        setData(idx, result[0], 0x100);
-        setData(idx, result[1], 0x101);
+        setData(idx, text, Constants::SerializeRole);
         beginRow++;
     }
 
