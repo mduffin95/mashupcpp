@@ -1,7 +1,7 @@
 #include "searcharea.h"
 #include "ui_searcharea.h"
 #include "segment.h"
-#include "segmentsearchmodel.h"
+#include "segmentlistmodel.h"
 
 #include <QtDebug>
 
@@ -10,17 +10,17 @@ SearchArea::SearchArea(QWidget *parent) :
     ui(new Ui::SearchArea)
 {
     ui->setupUi(this);
-    model = new SegmentSearchModel;
+    model = new SegmentListModel;
     ui->listView->setModel(model);
     //ui->listView->setDragDropMode(QAbstractItemView::DragDrop);
 
     ui->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     //ui->listView->setDragEnabled(true);
     //ui->listView->setAcceptDrops(true);
-    ui->listView->setDragDropMode(QAbstractItemView::InternalMove);
+    ui->listView->setDragDropMode(QAbstractItemView::DragOnly);
     ui->listView->setDropIndicatorShown(true);
     ui->listView->setDragDropOverwriteMode(false);
-    ui->listView->setDefaultDropAction(Qt::MoveAction);
+    ui->listView->setDefaultDropAction(Qt::CopyAction);
 }
 
 SearchArea::~SearchArea()

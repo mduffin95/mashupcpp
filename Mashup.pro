@@ -29,8 +29,7 @@ SOURCES += main.cpp\
     segment.cpp \
     sequence.cpp \
     searcharea.cpp \
-    segmentlistmodel.cpp \
-    segmentsearchmodel.cpp
+    segmentlistmodel.cpp
 
 HEADERS  += mainwindow.h \
     program.h \
@@ -38,9 +37,8 @@ HEADERS  += mainwindow.h \
     sequence.h \
     srtparser.h \
     searcharea.h \
-    segmentlistmodel.h \
-    segmentsearchmodel.h \
-    constants.h
+    constants.h \
+    segmentlistmodel.h
 
 FORMS    += mainwindow.ui \
     searcharea.ui

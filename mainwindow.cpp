@@ -15,8 +15,10 @@ MainWindow::MainWindow(QWidget *parent) :
     model = new SegmentListModel;
     view = new QListView;
     view->setModel(model);
-    view->setDragDropMode(QAbstractItemView::DropOnly); //Accept drops from the search area
+    view->setDragDropMode(QAbstractItemView::DragDrop); //Accept drops from the search area
     view->setDropIndicatorShown(true);
+    view->setDragDropOverwriteMode(false);
+    view->setDefaultDropAction(Qt::MoveAction);
     setCentralWidget(view);
 }
 

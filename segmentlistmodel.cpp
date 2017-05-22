@@ -1,8 +1,14 @@
 #include "segmentlistmodel.h"
+#include "constants.h"
 #include <QtDebug>
+#include <QStringListModel>
+#include <QMimeData>
+
 
 int SegmentListModel::rowCount(const QModelIndex &parent) const
 {
+    if (parent.isValid())
+        return 0;
     return segmentList.count();
 }
 
@@ -14,14 +20,29 @@ QVariant SegmentListModel::data(const QModelIndex &index, int role) const
     if (index.row() >= segmentList.size())
         return QVariant();
 
-    if (role == Qt::DisplayRole || role == Qt::EditRole)
+    if (role == Qt::DisplayRole)
         return segmentList.at(index.row())->getText();
+    if (role == Constants::SerializeRole)
+        return segmentList.at(index.row())->serialize();
     else
         return QVariant();
 }
 
-QVariant SegmentListModel::headerData(int section, Qt::Orientation orientation,
-                                     int role) const
+bool SegmentListModel::setData(const QModelIndex &index,
+                              const QVariant &value, int role)
+{
+    if (index.isValid()) {
+        if (role == Constants::SerializeRole)
+        {
+            segmentList.at(index.row())->deserialize(value.toString());
+            emit dataChanged(index, index);
+            return true;
+        }
+    }
+    return false;
+}
+
+QVariant SegmentListModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -32,37 +53,52 @@ QVariant SegmentListModel::headerData(int section, Qt::Orientation orientation,
         return QString("Row %1").arg(section);
 }
 
-Qt::ItemFlags SegmentListModel::flags(const QModelIndex &index) const
+void SegmentListModel::setProgram(Program *prog)
 {
-    if (!index.isValid())
-        return Qt::ItemIsEnabled;
-
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+    program = prog;
+    qDebug() << "Program set";
 }
 
-bool SegmentListModel::setData(const QModelIndex &index,
-                              const QVariant &value, int role)
+void SegmentListModel::search(QString searchString)
 {
-    if (value.canConvert<Segment*>())
+    beginResetModel();
+    qDeleteAll(segmentList);
+    segmentList.clear();
+    int from = 0;
+    while(true)
     {
-        Segment *newSegment = value.value<Segment*>();
-        if (index.isValid() && role == Qt::EditRole) {
-
-            segmentList.replace(index.row(), newSegment);
-            emit dataChanged(index, index);
-            return true;
+        from = program->getText().indexOf(searchString, from);
+        if(from == -1) break;
+        else
+        {
+            segmentList.append(new Segment(program, from, searchString.length()));
+            from += 1;
         }
     }
-    return false;
+    endResetModel();
 }
 
-/*
+Qt::ItemFlags SegmentListModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
+
+    if (index.isValid())
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
+    else
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+}
+
+Qt::DropActions SegmentListModel::supportedDropActions() const
+{
+    return Qt::CopyAction | Qt::MoveAction;
+}
+
 bool SegmentListModel::insertRows(int position, int rows, const QModelIndex &index = QModelIndex())
 {
     beginInsertRows(QModelIndex(), position, position+rows-1);
 
     for (int row = 0; row < rows; ++row) {
-        stringList.insert(position, "");
+        segmentList.insert(position, new Segment(program, 0, 0));
     }
 
     endInsertRows();
@@ -71,17 +107,95 @@ bool SegmentListModel::insertRows(int position, int rows, const QModelIndex &ind
 
 bool SegmentListModel::removeRows(int position, int rows, const QModelIndex &index = QModelIndex())
 {
+    beginRemoveRows(QModelIndex(), position, position+rows-1);
 
+    for (int row = 0; row < rows; ++row) {
+        segmentList.removeAt(position);
+    }
+
+    endRemoveRows();
+    return true;
 }
-*/
 
-Qt::DropActions SegmentListModel::supportedDropActions() const
+
+QStringList SegmentListModel::mimeTypes() const
 {
-    return Qt::CopyAction | Qt::MoveAction;
+    QStringList types;
+    types << "application/vnd.segment.list";
+    return types;
 }
 
-void SegmentListModel::setProgram(Program *prog)
+QMimeData *SegmentListModel::mimeData(const QModelIndexList &indexes) const
 {
-    program = prog;
-    qDebug() << "Program set";
+    QMimeData *mimeData = new QMimeData();
+    QByteArray encodedData;
+
+    QDataStream stream(&encodedData, QIODevice::WriteOnly);
+
+    foreach (const QModelIndex &index, indexes) {
+        if (index.isValid()) {
+            stream << data(index, Constants::SerializeRole).toString();
+        }
+    }
+
+    mimeData->setData("application/vnd.segment.list", encodedData);
+    return mimeData;
+}
+
+bool SegmentListModel::canDropMimeData(const QMimeData *data,
+    Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    Q_UNUSED(action);
+    Q_UNUSED(row);
+    Q_UNUSED(parent);
+
+    if (!data->hasFormat("application/vnd.segment.list"))
+        return false;
+
+    if (column > 0)
+        return false;
+
+    return true;
+}
+
+bool SegmentListModel::dropMimeData(const QMimeData *data,
+    Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    if (!canDropMimeData(data, action, row, column, parent))
+        return false;
+
+    if (action == Qt::IgnoreAction)
+        return true;
+
+    int beginRow;
+    if (row != -1)
+        beginRow = row;
+
+    else if (parent.isValid())
+        beginRow = parent.row();
+    else
+        beginRow = rowCount(QModelIndex());
+
+    QByteArray encodedData = data->data("application/vnd.segment.list");
+    QDataStream stream(&encodedData, QIODevice::ReadOnly);
+    QStringList newItems;
+    int rows = 0;
+
+    while (!stream.atEnd())
+    {
+        QString text;
+        stream >> text;
+        newItems << text;
+        ++rows;
+    }
+
+    insertRows(beginRow, rows, QModelIndex());
+    foreach (const QString &text, newItems)
+    {
+        QModelIndex idx = index(beginRow, 0, QModelIndex());
+        setData(idx, text, Constants::SerializeRole);
+        beginRow++;
+    }
+
+    return true;
 }

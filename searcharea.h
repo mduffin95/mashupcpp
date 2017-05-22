@@ -2,7 +2,7 @@
 #define SEARCHAREA_H
 #include "program.h"
 #include "segment.h"
-#include "segmentsearchmodel.h"
+#include "segmentlistmodel.h"
 #include <QDockWidget>
 
 namespace Ui {
@@ -25,7 +25,7 @@ private slots:
 private:
     Ui::SearchArea *ui;
     Program *prog;
-    SegmentSearchModel *model;
+    SegmentListModel *model;
     QString text;
 
     void search(QString searchString, QVector<Segment*> &results);
