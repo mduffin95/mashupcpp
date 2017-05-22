@@ -15,12 +15,11 @@ SearchArea::SearchArea(QWidget *parent) :
     //ui->listView->setDragDropMode(QAbstractItemView::DragDrop);
 
     ui->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    //ui->listView->setDragEnabled(true);
-    //ui->listView->setAcceptDrops(true);
     ui->listView->setDragDropMode(QAbstractItemView::DragOnly);
     ui->listView->setDropIndicatorShown(true);
     ui->listView->setDragDropOverwriteMode(false);
     ui->listView->setDefaultDropAction(Qt::CopyAction);
+    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers); //Prevents editing
 }
 
 SearchArea::~SearchArea()

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "searcharea.h"
+#include "segmentdelegate.h"
 
 #include <QFileDialog>
 #include <QtDebug>
@@ -19,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     view->setDropIndicatorShown(true);
     view->setDragDropOverwriteMode(false);
     view->setDefaultDropAction(Qt::MoveAction);
+    SegmentDelegate *delegate = new SegmentDelegate;
+    view->setItemDelegate(delegate);
     setCentralWidget(view);
 }
 

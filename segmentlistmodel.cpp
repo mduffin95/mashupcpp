@@ -83,7 +83,7 @@ Qt::ItemFlags SegmentListModel::flags(const QModelIndex &index) const
     Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
 
     if (index.isValid())
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEditable;
     else
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 }
