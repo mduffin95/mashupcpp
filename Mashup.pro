@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     sequence.cpp \
     searcharea.cpp \
     segmentlistmodel.cpp \
-    segmentdelegate.cpp
+    segmentdelegate.cpp \
+    segmenteditor.cpp
 
 HEADERS  += mainwindow.h \
     program.h \
@@ -40,7 +41,8 @@ HEADERS  += mainwindow.h \
     searcharea.h \
     constants.h \
     segmentlistmodel.h \
-    segmentdelegate.h
+    segmentdelegate.h \
+    segmenteditor.h
 
 FORMS    += mainwindow.ui \
     searcharea.ui

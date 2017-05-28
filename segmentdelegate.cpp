@@ -1,5 +1,6 @@
 #include "segmentdelegate.h"
 #include "constants.h"
+#include "segmenteditor.h"
 #include <QSpinBox>
 #include <QLineEdit>
 
@@ -13,8 +14,9 @@ QWidget *SegmentDelegate::createEditor(QWidget *parent,
     const QModelIndex &/* index */) const
 {
     //TODO: Make my own editor
-    QLineEdit *editor = new QLineEdit(parent);
-    editor->setFrame(false);
+    //QLineEdit *editor = new QLineEdit(parent);
+    SegmentEditor *editor = new SegmentEditor;
+    //editor->setFrame(false);
 
     return editor;
 }
@@ -24,8 +26,8 @@ void SegmentDelegate::setEditorData(QWidget *editor,
 {
     QString text = index.model()->data(index, Constants::SerializeRole).toString();
 
-    QLineEdit *lineEdit = static_cast<QLineEdit*>(editor);
-    lineEdit->insert(text);
+    //QLineEdit *lineEdit = static_cast<QLineEdit*>(editor);
+    //lineEdit->insert(text);
 }
 
 void SegmentDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
