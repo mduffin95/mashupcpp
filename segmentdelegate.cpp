@@ -4,7 +4,7 @@
 #include <QSpinBox>
 #include <QLineEdit>
 
-SegmentDelegate::SegmentDelegate(QObject */* parent */)
+SegmentDelegate::SegmentDelegate(Program *prog, QObject */* parent */) : program(prog)
 {
 
 }
@@ -13,10 +13,7 @@ QWidget *SegmentDelegate::createEditor(QWidget *parent,
     const QStyleOptionViewItem &/* option */,
     const QModelIndex &/* index */) const
 {
-    //TODO: Make my own editor
-    //QLineEdit *editor = new QLineEdit(parent);
     SegmentEditor *editor = new SegmentEditor;
-    //editor->setFrame(false);
 
     return editor;
 }
@@ -24,17 +21,23 @@ QWidget *SegmentDelegate::createEditor(QWidget *parent,
 void SegmentDelegate::setEditorData(QWidget *editor,
                                     const QModelIndex &index) const
 {
-    QString text = index.model()->data(index, Constants::SerializeRole).toString();
+    QString encoding = index.model()->data(index, Constants::SerializeRole).toString();
 
-    //QLineEdit *lineEdit = static_cast<QLineEdit*>(editor);
-    //lineEdit->insert(text);
+    QStringList result = encoding.split(',');
+    Q_ASSERT(result.length() == 2);
+
+    SegmentEditor *segEdit = static_cast<SegmentEditor*>(editor);
+    QStringRef ref = program->getStringRef(result[0].toInt(), result[1].toInt());
+    segEdit->setReference(ref);
 }
 
 void SegmentDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                    const QModelIndex &index) const
 {
-    QLineEdit *lineEdit = static_cast<QLineEdit*>(editor);
-    QString text = lineEdit->text();
+    SegmentEditor *segEdit = static_cast<SegmentEditor*>(editor);
+    QStringRef ref = segEdit->getReference();
+
+    QString text = QString::number(ref.position()) + "," + QString::number(ref.length());
 
     model->setData(index, text, Constants::SerializeRole);
 }

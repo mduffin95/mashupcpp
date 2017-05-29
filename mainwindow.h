@@ -23,7 +23,7 @@ public:
     SearchArea *searchArea;
 
     SegmentListModel *model;
-    //Program *prog;
+    Program *program;
 
 private slots:
     void on_actionOpen_triggered();

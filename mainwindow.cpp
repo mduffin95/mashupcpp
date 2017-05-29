@@ -20,8 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
     view->setDropIndicatorShown(true);
     view->setDragDropOverwriteMode(false);
     view->setDefaultDropAction(Qt::MoveAction);
-    SegmentDelegate *delegate = new SegmentDelegate;
-    view->setItemDelegate(delegate);
     setCentralWidget(view);
 }
 
@@ -40,9 +38,12 @@ void MainWindow::createDockWindows()
 void MainWindow::on_actionOpen_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this);
-    Program *prog = new Program(fileName, "");
+    program = new Program(fileName, "");
     qDebug() << fileName;
 
-    model->setProgram(prog);
-    searchArea->setProgram(prog);
+    SegmentDelegate *delegate = new SegmentDelegate(program);
+    view->setItemDelegate(delegate);
+
+    model->setProgram(program);
+    searchArea->setProgram(program);
 }
